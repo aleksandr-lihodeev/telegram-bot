@@ -46,9 +46,12 @@ bot.on("text", async (ctx) => {
       }
 
       await ctx.deleteMessage(ctx.message.message_id);
-      await ctx.replyWithMarkdown(
-        `*${ctx.message.from.username}:*\n${censoredMessage}`
-      );
+
+      const username =
+        ctx.message.from.username ||
+        `${ctx.message.from.first_name} ${ctx.message.from.last_name || ""}`;
+
+      await ctx.replyWithMarkdown(`*${username}:*\n${censoredMessage}`);
     } catch (err) {
       console.error(err);
       await ctx.reply(
