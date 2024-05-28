@@ -1,15 +1,33 @@
 require("dotenv").config();
 const { Telegraf } = require("telegraf");
 
+if (!process.env.BOT_TOKEN) {
+  throw new Error("BOT_TOKEN is not defined in the .env file");
+}
+
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
 // Список запрещенных слов
-const badWords = ["badword1", "badword2", "badword3"];
+const badWords = ["сука", "пиздец", "ебал"];
 
 // Функция замены матов на звездочки
 const censorMessage = (text) => {
   const regex = new RegExp(badWords.join("|"), "gi");
   return text.replace(regex, (match) => "*".repeat(match.length));
+};
+
+// Проверка прав администратора
+const checkAdminRights = async (ctx) => {
+  try {
+    const member = await ctx.telegram.getChatMember(
+      ctx.chat.id,
+      ctx.botInfo.id
+    );
+    return member.status === "administrator" || member.status === "creator";
+  } catch (err) {
+    console.error("Error checking admin rights:", err);
+    return false;
+  }
 };
 
 // Обработчик сообщений
@@ -19,14 +37,22 @@ bot.on("text", async (ctx) => {
 
   if (originalMessage !== censoredMessage) {
     try {
+      const hasAdminRights = await checkAdminRights(ctx);
+      if (!hasAdminRights) {
+        await ctx.reply(
+          "У меня нет прав на удаление сообщений, пожалуйста, назначьте меня администратором с соответствующими правами."
+        );
+        return;
+      }
+
       await ctx.deleteMessage(ctx.message.message_id);
       await ctx.replyWithMarkdown(
-        `*Измененное сообщение от ${ctx.message.from.username}:*\n${censoredMessage}`
+        `*${ctx.message.from.username}:*\n${censoredMessage}`
       );
     } catch (err) {
       console.error(err);
-      ctx.reply(
-        "У меня нет прав на удаление сообщений, пожалуйста, назначьте меня администратором с соответствующими правами."
+      await ctx.reply(
+        "Произошла ошибка при попытке удалить сообщение. Пожалуйста, попробуйте позже."
       );
     }
   }
