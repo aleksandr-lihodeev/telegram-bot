@@ -12,8 +12,10 @@ const badWords = ["сука", "пиздец", "ебал"];
 
 // Функция замены матов на звездочки
 const censorMessage = (text) => {
-  const regex = new RegExp(badWords.join("|"), "gi");
-  return text.replace(regex, (match) => "*".repeat(match.length));
+  return badWords.reduce((censoredText, word) => {
+    const regex = new RegExp(word, "gi");
+    return censoredText.replace(regex, "*".repeat(word.length));
+  }, text);
 };
 
 // Проверка прав администратора
