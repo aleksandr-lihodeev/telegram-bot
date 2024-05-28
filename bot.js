@@ -12,18 +12,8 @@ const badWords = ["сука", "пиздец", "ебал"];
 
 // Функция замены матов на звездочки
 const censorMessage = (text) => {
-  const words = text.split(/\s+/); // Разбиваем текст на слова
-
-  // Заменяем запрещенные слова на звездочки
-  const censoredWords = words.map((word) => {
-    if (badWords.includes(word.toLowerCase())) {
-      return "*".repeat(word.length);
-    }
-    return word;
-  });
-
-  // Собираем текст обратно из замененных слов
-  return censoredWords.join(" ");
+  const regex = new RegExp(badWords.join("|"), "giu"); // Добавлен флаг 'u' для корректной работы с Unicode
+  return text.replace(regex, (match) => "*".repeat(match.length));
 };
 
 // Проверка прав администратора
