@@ -12,16 +12,18 @@ const badWords = ["сука", "пиздец", "ебал"];
 
 // Функция замены матов на звездочки
 const censorMessage = (text) => {
-  return badWords.reduce((censoredText, word) => {
-    const regex = new RegExp(
-      word.replace(
-        /[а-яА-Я]/g,
-        (c) => `[${c.toLowerCase()}${c.toUpperCase()}]`
-      ),
-      "gi"
-    );
-    return censoredText.replace(regex, "*".repeat(word.length));
-  }, text);
+  const words = text.split(/\s+/); // Разбиваем текст на слова
+
+  // Заменяем запрещенные слова на звездочки
+  const censoredWords = words.map((word) => {
+    if (badWords.includes(word.toLowerCase())) {
+      return "*".repeat(word.length);
+    }
+    return word;
+  });
+
+  // Собираем текст обратно из замененных слов
+  return censoredWords.join(" ");
 };
 
 // Проверка прав администратора
