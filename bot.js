@@ -13,7 +13,7 @@ const swearRegex =
 
 // Функция замены ругательств и нецензурных выражений на звездочки
 const censorMessage = (text) => {
-  return text.replace(swearRegex, (match) => "*".repeat(match.length));
+  return text.replace(swearRegex, (match) => "x".repeat(match.length));
 };
 
 // Проверка прав администратора
@@ -51,7 +51,9 @@ bot.on("text", async (ctx) => {
         ctx.message.from.username ||
         `${ctx.message.from.first_name} ${ctx.message.from.last_name || ""}`;
 
-      await ctx.replyWithMarkdown(`*${username}:*\n${censoredMessage}`);
+      console.log(censoredMessage);
+
+      await ctx.replyWithMarkdown(`*${username}:* ${censoredMessage}`);
     } catch (err) {
       console.error(err);
       await ctx.reply(
